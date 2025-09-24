@@ -1,0 +1,76 @@
+/* Design tokens and CSS variables for NutriEmpower */
+:root {
+    /* Colors */
+    --primary-green: #27ae60;
+    --primary-green-dark: #1e8a4a;
+    --primary-green-bg: rgba(39,174,96,0.08);
+    --secondary-blue: #3498db;
+    --secondary-blue-light: #7fb8e6;
+    --secondary-blue-dark: #2b86c6;
+    --accent-orange: #f39c12;
+    --accent-orange-dark: #d6860a;
+
+    --neutral-white: #ffffff;
+    --neutral-gray: #6b7280;
+    --neutral-gray-dark: #374151;
+    --neutral-gray-light: #e5e7eb;
+    --neutral-gray-bg: #f8fafc;
+
+    --error: #e74c3c;
+
+    /* Typography */
+    --font-body: 'Roboto', system-ui, -apple-system, 'Segoe UI', Arial;
+    --font-heading: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Arial;
+    --font-size-base: 16px;
+    --font-size-sm: 13px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --font-size-3xl: 28px;
+    --font-size-4xl: 36px;
+    --font-size-5xl: 48px;
+    --font-size-xs: 12px;
+
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+
+    --line-height-relaxed: 1.6;
+    --line-height-tight: 1.2;
+
+    /* Spacing */
+    --spacing-xs: 6px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 40px;
+    --spacing-3xl: 56px;
+    --spacing-4xl: 80px;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+    --radius-full: 9999px;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 6px 18px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+    --shadow-xl: 0 20px 60px rgba(0,0,0,0.16);
+    --shadow-green: 0 8px 24px rgba(39,174,96,0.18);
+    --shadow-blue: 0 8px 24px rgba(52,152,219,0.18);
+
+    --transition-fast: 150ms cubic-bezier(.4,0,.2,1);
+    --transition-normal: 300ms cubic-bezier(.4,0,.2,1);
+
+    --container-max-width: 1200px;
+    --container-padding: 24px;
+
+    --z-sticky: 60;
+    --z-modal: 80;
+    --z-fixed: 90;
+    --z-dropdown: 70;
+}
+
+/* Small accessibility helpers */
+html { color-scheme: light; }

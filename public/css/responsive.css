@@ -1,0 +1,74 @@
+/* Responsive helpers and overrides for smaller screens */
+
+/* Utility responsive breakpoints */
+@media (max-width: 1024px) {
+	.container { padding: 0 20px; }
+}
+
+@media (max-width: 768px) {
+	.nav-menu { display: none; }
+	.mobile-menu-toggle { display: flex; }
+	.search-input { width: 140px; }
+	.hero { min-height: 70vh; }
+}
+
+@media (max-width: 480px) {
+	.search-input { display: none; }
+	.hero-title { font-size: 1.6rem; }
+	.hero-subtitle { font-size: 0.95rem; }
+	.nav-actions { gap: 8px; }
+	.solutions-grid { grid-template-columns: 1fr; }
+	.hero-stats { flex-direction: column; gap: 12px; }
+}
+
+/* Small tweaks for components */
+.specialist-avatar { width: 64px; height: 64px; }
+.specialists-grid { gap: 20px; }
+
+/* Appended responsive rules from probable css files */
+
+/* Mobile-First Responsive Design Enhancements */
+
+/* Small devices (576px and up) */
+@media (min-width: 576px) {
+	.container { padding: 0 var(--spacing-md); }
+	.hero-stats { flex-direction: row; gap: var(--spacing-xl); }
+	.solutions-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+}
+
+/* Medium devices (768px and up) */
+@media (min-width: 768px) {
+	.nav-menu { display: flex !important; }
+	.mobile-menu-toggle { display: none !important; }
+	.hero-ctas { flex-direction: row; }
+	.ai-interface { grid-template-columns: 2fr 1fr; }
+	.community-content { grid-template-columns: 2fr 1fr; }
+	.dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+	.recipes-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+	.progress-rings { flex-direction: row; }
+	.weight-stats { grid-template-columns: repeat(3, 1fr); }
+	.action-buttons { flex-direction: row; }
+}
+
+/* Large devices (1024px and up) */
+@media (min-width: 1024px) {
+	.container { padding: 0 var(--spacing-lg); }
+	.hero-title { font-size: var(--font-size-5xl); }
+	.hero-subtitle { font-size: var(--font-size-xl); }
+	.solutions-grid { grid-template-columns: repeat(4, 1fr); }
+	.recipes-grid { grid-template-columns: repeat(3, 1fr); }
+	.dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Extra large devices (1200px and up) */
+@media (min-width: 1200px) {
+	.container { padding: 0 var(--spacing-xl); }
+	.solutions-grid { grid-template-columns: repeat(4, 1fr); gap: var(--spacing-2xl); }
+	.recipes-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Extra extra large devices (1440px and up) */
+@media (min-width: 1440px) {
+	.hero-title { font-size: clamp(3rem, 8vw, 5rem); }
+	.solutions-grid { grid-template-columns: repeat(4, 1fr); gap: var(--spacing-3xl); }
+}
