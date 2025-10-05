@@ -14,4 +14,6 @@ router.get('/recipes', apiController.getRecipes);
 // Specialist endpoints
 router.get('/specialists', apiController.getSpecialists);
 
+// Chat endpoints handled directly in app.js for minimal setup
+
 module.exports = router;

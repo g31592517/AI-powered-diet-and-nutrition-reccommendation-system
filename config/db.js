@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
+        const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+        if (!uri) {
+            console.warn('MONGO_URI not set; skipping MongoDB connection.');
+            return;
+        }
+
+        const conn = await mongoose.connect(uri);
 
         console.log(`MongoDB Connected: ${conn.connection.host}`);
         
@@ -24,7 +30,7 @@ const connectDB = async () => {
 
     } catch (error) {
         console.error('Error connecting to MongoDB:', error.message);
-        process.exit(1);
+        console.warn('Continuing without MongoDB. Some features may be disabled.');
     }
 };
 

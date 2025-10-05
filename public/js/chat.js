@@ -1,16 +1,22 @@
-// AI Chat Interface JavaScript
+// AI Chat Interface JavaScript with Ollama Integration
+// Real-time chat with NutriAI Assistant using WebSocket and REST API
 
 class NutriAIChat {
     constructor() {
         this.messages = [];
         this.isTyping = false;
+        this.sessionId = null;
+        this.ws = null;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
         this.init();
     }
     
     init() {
         this.bindEvents();
-        this.loadMockResponses();
         this.setupQuickPrompts();
+        // Minimal setup: skip WebSocket; use REST only
+        this.loadSession();
     }
     
     bindEvents() {
@@ -73,6 +79,136 @@ class NutriAIChat {
         this.sendMessage();
     }
     
+    initializeWebSocket() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/chat`;
+        
+        try {
+            this.ws = new WebSocket(wsUrl);
+            
+            this.ws.onopen = () => {
+                console.log('🔌 WebSocket connected');
+                this.reconnectAttempts = 0;
+                this.updateConnectionStatus('connected');
+            };
+            
+            this.ws.onmessage = (event) => {
+                this.handleWebSocketMessage(event);
+            };
+            
+            this.ws.onclose = () => {
+                console.log('🔌 WebSocket disconnected');
+                this.updateConnectionStatus('disconnected');
+                this.attemptReconnect();
+            };
+            
+            this.ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                this.updateConnectionStatus('error');
+            };
+            
+        } catch (error) {
+            console.error('Failed to initialize WebSocket:', error);
+            this.updateConnectionStatus('error');
+        }
+    }
+    
+    attemptReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            console.log(`🔄 Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+            
+            setTimeout(() => {
+                this.initializeWebSocket();
+            }, 2000 * this.reconnectAttempts);
+        } else {
+            console.error('❌ Max reconnection attempts reached');
+            this.updateConnectionStatus('failed');
+        }
+    }
+    
+    updateConnectionStatus(status) {
+        const statusElement = document.querySelector('.connection-status');
+        if (statusElement) {
+            statusElement.className = `connection-status ${status}`;
+            statusElement.textContent = this.getStatusText(status);
+        }
+    }
+    
+    getStatusText(status) {
+        const statusTexts = {
+            'connected': 'Online • Ready to help',
+            'disconnected': 'Connecting...',
+            'error': 'Connection error',
+            'failed': 'Connection failed'
+        };
+        return statusTexts[status] || 'Unknown status';
+    }
+    
+    handleWebSocketMessage(event) {
+        try {
+            const data = JSON.parse(event.data);
+            
+            switch (data.type) {
+                case 'welcome':
+                    this.sessionId = data.sessionId;
+                    this.saveSession();
+                    break;
+                    
+                case 'typing':
+                    this.showTypingIndicator();
+                    break;
+                    
+                case 'response_chunk':
+                    this.handleResponseChunk(data.content);
+                    break;
+                    
+                case 'response_complete':
+                    this.handleResponseComplete(data);
+                    break;
+                    
+                case 'error':
+                    this.handleError(data.error);
+                    break;
+                    
+                case 'pong':
+                    // Handle ping-pong for connection health
+                    break;
+            }
+        } catch (error) {
+            console.error('Error handling WebSocket message:', error);
+        }
+    }
+    
+    handleResponseChunk(content) {
+        // Update the last AI message with streaming content
+        const lastMessage = this.messages[this.messages.length - 1];
+        if (lastMessage && lastMessage.sender === 'ai') {
+            lastMessage.content += content;
+            this.updateLastMessage(lastMessage);
+        }
+    }
+    
+    handleResponseComplete(data) {
+        this.hideTypingIndicator();
+        
+        // Update the complete response
+        const lastMessage = this.messages[this.messages.length - 1];
+        if (lastMessage && lastMessage.sender === 'ai') {
+            lastMessage.content = data.content;
+            lastMessage.timestamp = new Date(data.timestamp);
+            this.updateLastMessage(lastMessage);
+        }
+        
+        // Update session summary
+        this.updateSessionSummary(data.content);
+    }
+    
+    handleError(error) {
+        this.hideTypingIndicator();
+        this.addMessage(`Error: ${error}`, 'ai', 'error');
+    }
+    
     sendMessage() {
         const chatInput = document.getElementById('chat-input');
         const message = chatInput.value.trim();
@@ -83,21 +219,85 @@ class NutriAIChat {
         this.addMessage(message, 'user');
         chatInput.value = '';
         
-        // Show typing indicator
-        this.showTypingIndicator();
-        
-        // Simulate AI response delay
-        setTimeout(() => {
-            this.hideTypingIndicator();
-            this.generateAIResponse(message);
-        }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+        // Minimal version: always use REST API for simplicity
+        this.sendRestMessage(message);
     }
     
-    addMessage(content, sender) {
+    sendWebSocketMessage(message) {
+        const messageData = {
+            type: 'chat',
+            text: message,
+            options: this.getChatOptions()
+        };
+        
+        this.ws.send(JSON.stringify(messageData));
+    }
+    
+    async sendRestMessage(message) {
+        try {
+            this.showTypingIndicator();
+            
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    sessionId: this.sessionId,
+                    options: this.getChatOptions()
+                })
+            });
+            
+            const data = await response.json();
+            
+            this.hideTypingIndicator();
+            
+            if (data.success) {
+                this.sessionId = data.sessionId;
+                this.saveSession();
+                this.addMessage(data.response, 'ai');
+                this.updateSessionSummary(data.response);
+            } else {
+                this.addMessage(`Error: ${data.error}`, 'ai', 'error');
+            }
+            
+        } catch (error) {
+            this.hideTypingIndicator();
+            this.addMessage(`Error: ${error.message}`, 'ai', 'error');
+        }
+    }
+    
+    getChatOptions() {
+        // Get user preferences from UI or stored data
+        return {
+            focus: this.getUserFocus(),
+            allergies: this.getUserAllergies(),
+            budget: this.getUserBudget()
+        };
+    }
+    
+    getUserFocus() {
+        // This could be determined from user profile or current context
+        return null;
+    }
+    
+    getUserAllergies() {
+        // This could be retrieved from user profile
+        return null;
+    }
+    
+    getUserBudget() {
+        // This could be retrieved from user profile
+        return null;
+    }
+    
+    addMessage(content, sender, type = 'normal') {
         const message = {
             id: Date.now(),
             content,
             sender,
+            type,
             timestamp: new Date()
         };
         
@@ -116,7 +316,7 @@ class NutriAIChat {
         if (!chatMessages) return;
         
         const messageElement = document.createElement('div');
-        messageElement.className = `message ${message.sender}-message`;
+        messageElement.className = `message ${message.sender}-message ${message.type}`;
         messageElement.dataset.messageId = message.id;
         
         const avatar = message.sender === 'ai' ? 
@@ -148,11 +348,21 @@ class NutriAIChat {
         }, 100);
     }
     
+    updateLastMessage(message) {
+        const messageElement = document.querySelector(`[data-message-id="${message.id}"]`);
+        if (messageElement) {
+            const contentElement = messageElement.querySelector('.message-content');
+            if (contentElement) {
+                contentElement.innerHTML = this.formatMessageContent(message.content);
+            }
+        }
+    }
+    
     formatMessageContent(content) {
         // Handle different types of content
         if (typeof content === 'string') {
-            // Simple text message
-            return `<p>${this.escapeHtml(content)}</p>`;
+            // Simple text message with basic formatting
+            return `<p>${this.escapeHtml(content).replace(/\n/g, '<br>')}</p>`;
         } else if (content.type === 'nutrition_analysis') {
             // Nutrition analysis response
             return this.formatNutritionAnalysis(content);
@@ -282,60 +492,6 @@ class NutriAIChat {
         }
     }
     
-    generateAIResponse(userMessage) {
-        const response = this.getMockResponse(userMessage);
-        this.addMessage(response, 'ai');
-        
-        // Update quick actions based on response type
-        this.updateQuickActions(response);
-    }
-    
-    getMockResponse(userMessage) {
-        const lowerMessage = userMessage.toLowerCase();
-        
-        // Check for specific keywords and provide relevant responses
-        if (lowerMessage.includes('allergy') || lowerMessage.includes('nut')) {
-            return {
-                type: 'nutrition_analysis',
-                calories: '1,200',
-                protein: '45',
-                carbs: '120',
-                fat: '35',
-                summary: 'Based on your nut allergy, I\'ve created a safe meal plan that avoids all tree nuts and peanuts while maintaining balanced nutrition. All recipes use safe alternatives like seeds, coconut, and soy products.'
-            };
-        } else if (lowerMessage.includes('budget') || lowerMessage.includes('$50')) {
-            return {
-                type: 'meal_plan',
-                meals: [
-                    { time: 'Breakfast', name: 'Oatmeal with Banana', calories: 250 },
-                    { time: 'Lunch', name: 'Lentil Soup with Bread', calories: 300 },
-                    { time: 'Dinner', name: 'Rice and Beans Bowl', calories: 400 },
-                    { time: 'Snack', name: 'Apple with Peanut Butter', calories: 200 }
-                ],
-                summary: 'This budget-friendly meal plan costs approximately $45 per week and provides balanced nutrition with affordable ingredients like legumes, grains, and seasonal vegetables.'
-            };
-        } else if (lowerMessage.includes('weight') || lowerMessage.includes('lose')) {
-            return {
-                type: 'nutrition_analysis',
-                calories: '1,500',
-                protein: '120',
-                carbs: '150',
-                fat: '50',
-                summary: 'For healthy weight loss, focus on high-protein foods, complex carbohydrates, and healthy fats. This plan creates a 500-calorie daily deficit while maintaining muscle mass and energy levels.'
-            };
-        } else if (lowerMessage.includes('myth') || lowerMessage.includes('carbs')) {
-            return {
-                type: 'myth_busting',
-                claim: 'Carbohydrates are bad for you and cause weight gain',
-                fact: 'Carbohydrates are essential macronutrients that provide energy and support brain function',
-                evidence: 'Research shows that the quality and quantity of carbs matter more than avoiding them entirely. Whole grains, fruits, and vegetables are excellent sources of complex carbohydrates that support health.'
-            };
-        } else {
-            // Generic helpful response
-            return `Thank you for your question about "${userMessage}". I'm here to help you with personalized nutrition guidance. Could you tell me more about your specific goals or concerns? I can help with meal planning, allergy management, budget-friendly options, and evidence-based nutrition advice.`;
-        }
-    }
-    
     updateQuickActions(response) {
         const actionButtons = document.querySelectorAll('.action-btn');
         
@@ -352,13 +508,38 @@ class NutriAIChat {
         const sessionSummary = document.querySelector('.session-summary p');
         if (sessionSummary) {
             if (typeof content === 'string') {
-                sessionSummary.textContent = 'Providing personalized nutrition guidance based on your needs.';
-            } else if (content.type === 'meal_plan') {
-                sessionSummary.textContent = 'Created a personalized meal plan tailored to your preferences and goals.';
-            } else if (content.type === 'nutrition_analysis') {
-                sessionSummary.textContent = 'Analyzed your nutrition needs and provided detailed recommendations.';
+                // Extract key topics from the response
+                const topics = this.extractTopics(content);
+                if (topics.length > 0) {
+                    sessionSummary.textContent = `Providing guidance on: ${topics.join(', ')}`;
+                } else {
+                    sessionSummary.textContent = 'Providing personalized nutrition guidance based on your needs.';
+                }
             }
         }
+    }
+    
+    extractTopics(content) {
+        const topics = [];
+        const lowerContent = content.toLowerCase();
+        
+        if (lowerContent.includes('meal plan') || lowerContent.includes('meal planning')) {
+            topics.push('meal planning');
+        }
+        if (lowerContent.includes('allergy') || lowerContent.includes('allergies')) {
+            topics.push('allergy management');
+        }
+        if (lowerContent.includes('budget') || lowerContent.includes('cost')) {
+            topics.push('budget-friendly options');
+        }
+        if (lowerContent.includes('weight') || lowerContent.includes('lose weight')) {
+            topics.push('weight management');
+        }
+        if (lowerContent.includes('myth') || lowerContent.includes('fact')) {
+            topics.push('nutrition facts');
+        }
+        
+        return topics;
     }
     
     scrollToBottom() {
@@ -390,13 +571,67 @@ class NutriAIChat {
         }
     }
     
-    loadMockResponses() {
-        // Preload some common responses for better performance
-        this.mockResponses = {
-            welcome: "Hello! I'm your AI nutrition specialist. How can I help you today?",
-            help: "I can help you with meal planning, nutrition analysis, allergy management, and more. What would you like to know?",
-            contact: "For personalized guidance, you can also book a session with one of our certified nutrition specialists."
-        };
+    saveSession() {
+        if (this.sessionId) {
+            localStorage.setItem('nutriai_session_id', this.sessionId);
+        }
+    }
+    
+    loadSession() {
+        this.sessionId = localStorage.getItem('nutriai_session_id');
+        if (this.sessionId) {
+            this.loadChatHistory();
+        }
+    }
+    
+    async loadChatHistory() {
+        if (!this.sessionId) return;
+        
+        try {
+            const response = await fetch(`/api/chat/history/${this.sessionId}`);
+            const data = await response.json();
+            
+            if (data.success && data.history.messages) {
+                // Clear current messages
+                this.messages = [];
+                
+                // Load history messages
+                data.history.messages.forEach(msg => {
+                    this.messages.push({
+                        id: Date.now() + Math.random(),
+                        content: msg.content,
+                        sender: msg.role === 'assistant' ? 'ai' : 'user',
+                        timestamp: new Date(msg.timestamp)
+                    });
+                });
+                
+                // Display messages
+                this.messages.forEach(msg => {
+                    this.displayMessage(msg);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading chat history:', error);
+        }
+    }
+    
+    async clearChat() {
+        if (this.sessionId) {
+            try {
+                await fetch(`/api/chat/${this.sessionId}`, { method: 'DELETE' });
+                this.sessionId = null;
+                localStorage.removeItem('nutriai_session_id');
+            } catch (error) {
+                console.error('Error clearing chat:', error);
+            }
+        }
+        
+        // Clear UI
+        this.messages = [];
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+            chatMessages.innerHTML = '';
+        }
     }
 }
 

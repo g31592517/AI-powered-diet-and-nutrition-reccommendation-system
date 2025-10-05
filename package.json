@@ -4,7 +4,7 @@
   "description": "NutriEmpower - AI-Powered Nutrition Platform with Express.js and MongoDB",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "./scripts/start.sh",
     "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,15 +20,18 @@
   "author": "NutriEmpower Team",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^8.0.3",
-    "ejs": "^3.1.9",
-    "dotenv": "^16.3.1",
-    "body-parser": "^1.20.2",
-    "path": "^0.12.7",
+    "adm-zip": "^0.5.16",
     "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-ws": "^5.0.2",
     "helmet": "^7.1.0",
-    "express-rate-limit": "^7.1.5"
+    "mongoose": "^8.0.3",
+    "node-fetch": "^2.7.0",
+    "ollama": "^0.6.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

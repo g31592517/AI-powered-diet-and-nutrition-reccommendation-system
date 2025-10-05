@@ -580,3 +580,51 @@
 
 .streak-number { font-size: var(--font-size-2xl); color: var(--accent-orange); font-weight: var(--font-weight-bold); }
 
+/* Community Support Hub (EJS page) */
+.community-page { padding: var(--spacing-4xl) 0; }
+.community-hero { text-align: center; margin-bottom: var(--spacing-2xl); }
+.community-hero h1 { font-size: var(--font-size-4xl); margin-bottom: var(--spacing-xs); }
+.community-hero p { color: var(--neutral-gray-dark); }
+
+.community-layout { display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-2xl); align-items: start; }
+
+.topic-tabs { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; margin-bottom: var(--spacing-lg); }
+.topic-pill { border: 2px solid var(--neutral-gray-light); background: var(--neutral-white); padding: 8px 14px; border-radius: var(--radius-full); cursor: pointer; transition: all var(--transition-fast); font-weight: var(--font-weight-medium); }
+.topic-pill.active, .topic-pill:hover { background: var(--primary-green); color: var(--neutral-white); border-color: var(--primary-green); }
+
+.card { background: var(--neutral-white); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); }
+.create-post.card { padding: var(--spacing-md); }
+.create-post-body textarea { width: 100%; border: 2px solid var(--neutral-gray-light); border-radius: var(--radius-lg); padding: var(--spacing-md); font-size: var(--font-size-base); }
+.create-post-actions { display:flex; gap: var(--spacing-sm); align-items:center; margin-top: var(--spacing-sm); }
+
+.btn { border: none; padding: 10px 14px; border-radius: var(--radius-full); cursor: pointer; font-weight: var(--font-weight-medium); }
+.btn-success { background: var(--primary-green); color: var(--neutral-white); }
+.btn-success:hover { background: var(--primary-green-dark); }
+.btn-light { background: var(--neutral-gray-bg); color: var(--neutral-gray-dark); }
+
+.image-preview { margin-top: var(--spacing-sm); display:flex; gap: var(--spacing-sm); align-items:center; }
+.image-preview img { max-height: 120px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+
+.feed { display: grid; gap: var(--spacing-md); margin-top: var(--spacing-lg); }
+.post .post-header { display:flex; gap: var(--spacing-sm); align-items:center; }
+.post .avatar { width:40px; height:40px; border-radius:50%; background: var(--primary-green-bg); color: var(--primary-green); display:flex; align-items:center; justify-content:center; font-weight: var(--font-weight-bold); }
+.post .meta .name { font-weight: var(--font-weight-medium); }
+.post .meta .sub { color: var(--neutral-gray); font-size: var(--font-size-sm); }
+.post .content { margin-top: 6px; color: var(--neutral-gray-dark); }
+.post .post-image { width:100%; border-radius: var(--radius-lg); margin-top: var(--spacing-sm); box-shadow: var(--shadow-sm); }
+.post .actions { display:flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
+
+.challenge-card { padding: var(--spacing-lg); }
+.challenge-card h3 { margin-top: 0; }
+.challenge .progress { height: 10px; background: var(--neutral-gray-bg); border-radius: var(--radius-full); overflow: hidden; margin: var(--spacing-sm) 0; }
+.challenge .progress .bar { height:100%; background: var(--primary-green); }
+.challenge .progress-meta { display:flex; justify-content: space-between; color: var(--neutral-gray); font-size: var(--font-size-sm); }
+
+.trending-card { padding: var(--spacing-lg); }
+.trending-card .tags { display:flex; gap: var(--spacing-xs); flex-wrap: wrap; }
+.trending-card .tag { background: var(--primary-green-bg); color: var(--primary-green); padding: 6px 10px; border-radius: var(--radius-full); font-size: var(--font-size-sm); }
+
+@media (max-width: 900px) {
+  .community-layout { grid-template-columns: 1fr; }
+}
+

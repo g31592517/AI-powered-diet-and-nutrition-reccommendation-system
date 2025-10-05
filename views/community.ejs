@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Support Hub</title>
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <script defer src="https://kit.fontawesome.com/a2d9d5f6f5.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container community-page">
+        <header class="community-hero">
+            <h1>Community Support Hub</h1>
+            <p>Connect with others, share experiences, and get inspired on your nutrition journey</p>
+        </header>
+
+        <div class="community-layout">
+            <main class="community-main">
+                <div class="topic-tabs">
+                    <button class="topic-pill active" data-topic="All">All Topics</button>
+                    <button class="topic-pill" data-topic="Allergy Support">Allergy Support</button>
+                    <button class="topic-pill" data-topic="Budget Nutrition">Budget Nutrition</button>
+                    <button class="topic-pill" data-topic="Weight Journey">Weight Journey</button>
+                    <button class="topic-pill" data-topic="Recipe Exchange">Recipe Exchange</button>
+                    <button class="topic-pill" data-topic="Expert Q&A">Expert Q&A</button>
+                </div>
+
+                <section class="create-post card">
+                    <div class="create-post-body">
+                        <textarea id="post-text" rows="4" placeholder="Share your nutrition journey, ask questions..."></textarea>
+                        <div class="create-post-actions">
+                            <label class="btn btn-light" for="post-image"><i class="fas fa-image"></i> Add Image</label>
+                            <input id="post-image" type="file" accept="image/*" style="display:none" />
+                            <button id="share-post" class="btn btn-success"><i class="fas fa-paper-plane"></i> Share Post</button>
+                        </div>
+                        <div id="image-preview" class="image-preview" style="display:none">
+                            <img alt="preview" />
+                            <button class="btn btn-light" id="remove-image">Remove</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="feed" class="feed"></section>
+            </main>
+
+            <aside class="community-sidebar">
+                <div class="card challenge-card">
+                    <h3>Active Challenges</h3>
+                    <div class="challenge">
+                        <h4>7-Day Healthy Breakfast Challenge</h4>
+                        <p>Start your day right with nutritious breakfasts</p>
+                        <div class="progress"><div class="bar" style="width:43%"></div></div>
+                        <div class="progress-meta">3/7 days completed <span>43%</span></div>
+                        <button class="btn btn-success join-challenge">Join Challenge</button>
+                    </div>
+                </div>
+                <div class="card trending-card">
+                    <h3>Trending Topics</h3>
+                    <div class="tags">
+                        <span class="tag">#MealPrep</span>
+                        <span class="tag">#BudgetFriendly</span>
+                        <span class="tag">#AllergySafe</span>
+                        <span class="tag">#WeightLoss</span>
+                        <span class="tag">#PlantBased</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script src="/js/community.js"></script>
+</body>
+</html>
+
+

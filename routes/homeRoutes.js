@@ -14,4 +14,9 @@ router.post('/newsletter', homeController.subscribeNewsletter);
 // Health check
 router.get('/health', homeController.healthCheck);
 
+// Community hub page
+router.get('/community', (req, res) => {
+    res.render('community');
+});
+
 module.exports = router;

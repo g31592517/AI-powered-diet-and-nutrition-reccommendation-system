@@ -1,12 +1,13 @@
-# NutriEmpower Backend
+# NutriSolve – Diet & Nutrition Website
 
-A Node.js + Express + MongoDB backend for the NutriEmpower nutrition platform, following MVC architecture.
+Minimal Express.js app that serves the NutriSolve website (EJS views + static assets), integrates a lightweight local AI chat via Ollama, and uses MongoDB via Mongoose. Start with a single command: `npm start`.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (local or MongoDB Atlas)
+- Node.js (v16+)
+- MongoDB (local or Atlas)
+- Ollama (installed once: `curl -fsSL https://ollama.com/install.sh | sh`)
 - npm or yarn
 
 ### Installation
@@ -69,8 +70,9 @@ A Node.js + Express + MongoDB backend for the NutriEmpower nutrition platform, f
 │   ├── homeRoutes.js     # Home page routes
 │   └── apiRoutes.js      # API routes
 ├── views/
-│   ├── index.ejs         # Main landing page (converted from index.html)
-│   └── error.ejs         # Error page template
+│   ├── index.ejs         # Landing page
+│   ├── community.ejs     # Community Support Hub
+│   └── error.ejs         # Error page
 └── public/
     ├── css/              # All CSS files
     ├── js/               # All JavaScript files
@@ -80,8 +82,9 @@ A Node.js + Express + MongoDB backend for the NutriEmpower nutrition platform, f
 ## 🔧 Features
 
 - **MVC Architecture:** Clean separation of concerns
-- **EJS Templating:** Server-side rendering with preserved frontend design
-- **MongoDB Integration:** Ready for data persistence
+- **EJS Templating:** Server-side rendering
+- **MongoDB:** Ready for persistence
+- **Local AI Chat:** Minimal Ollama chat endpoint with small context and capped tokens
 - **Security:** Helmet, CORS, rate limiting
 - **Error Handling:** Comprehensive error management
 - **Static Assets:** Properly served from /public directory
@@ -103,7 +106,7 @@ A Node.js + Express + MongoDB backend for the NutriEmpower nutrition platform, f
 
 ## 🗄️ Database
 
-The application uses MongoDB with Mongoose ODM. A sample User model is included for testing.
+The app uses MongoDB with Mongoose. A sample `User` model is included.
 
 ### Sample Model Usage
 ```javascript
@@ -147,8 +150,7 @@ const user = new User({
    - Verify network access for Atlas
 
 2. **Port Already in Use:**
-   - Change PORT in `.env`
-   - Kill existing process: `lsof -ti:5000 | xargs kill`
+   - `PORT=5001 npm start` or kill: `lsof -ti:5000 | xargs kill -9`
 
 3. **Static Files Not Loading:**
    - Check file paths in EJS templates
@@ -163,44 +165,14 @@ const user = new User({
 ### Debug Mode
 Set `NODE_ENV=development` in `.env` for detailed error messages.
 
-## 📦 Dependencies
+## 📦 Tech Stack
 
-### Production
-- `express` - Web framework
-- `mongoose` - MongoDB ODM
-- `ejs` - Template engine
-- `dotenv` - Environment variables
-- `cors` - Cross-origin resource sharing
-- `helmet` - Security headers
-- `express-rate-limit` - Rate limiting
+Backend: Express, EJS, Mongoose, Helmet, CORS, express-rate-limit
 
-### Development
-- `nodemon` - Auto-restart development server
+AI: Ollama (local), minimal chat endpoint (model configurable via `OLLAMA_MODEL`)
 
-## 🔮 Future Enhancements
-
-- User authentication and authorization
-- Real-time chat functionality
-- Payment integration
-- Email notifications
-- File upload handling
-- Advanced API endpoints
-- Database migrations
-- Testing suite
-- Docker containerization
+Styling: CSS in `/public/css` with tokens in `variables.css`
 
 ## 📄 License
 
-MIT License - see LICENSE file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
----
-
-**Note:** This backend preserves the exact visual design and functionality of the original static frontend while adding server-side capabilities and database integration.
+MIT
